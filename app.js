@@ -2,10 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { initPostgresDB } = require('./config/db.postgres');
+const { initRedisDB } = require('./config/db.redis');
 
 // Importación de rutas
 const rolesRoutes = require('./routes/roles.routes');
 const usuariosRoutes = require('./routes/usuarios.routes');
+const cuponesRoutes = require('./routes/cupones.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,8 +42,9 @@ app.use('/api/usuarios', usuariosRoutes);
 // app.use('/api/reviews', reviewsRoutes);
 
 // Motor 3: Redis (Clave-Valor)
-// app.use('/api/cupones', cuponesRoutes);
-// app.use('/api/carritos', carritosRoutes);
+app.use('/api/cupones', cuponesRoutes);
+app.use('/api/coupons', cuponesRoutes); // Alias en inglés
+// app.use('/api/carritos', carritosRoutes); // Integrante 2
 
 // Manejo de rutas no encontradas (404)
 app.use((req, res) => {
@@ -56,6 +59,7 @@ app.use((req, res) => {
 // ==========================================
 const startServer = async () => {
   await initPostgresDB();
+  await initRedisDB();
 
   app.listen(PORT, () => {
     console.log(`[Server] Servidor escuchando en http://localhost:${PORT}`);
